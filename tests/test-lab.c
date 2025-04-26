@@ -73,11 +73,50 @@ void test_queue_dequeue_shutdown(void)
     queue_destroy(q);
 }
 
+void test_dequeue_empty_queue_after_shutdown(void) {
+  queue_t q = queue_init(10);
+  TEST_ASSERT_TRUE(q != NULL);
+
+  queue_shutdown(q);
+  TEST_ASSERT_TRUE(dequeue(q) == NULL);
+
+  queue_destroy(q);
+}
+
+void test_shutdown_empty_queue(void) {
+  queue_t q = queue_init(10);
+  TEST_ASSERT_TRUE(q != NULL);
+
+  TEST_ASSERT_TRUE(is_empty(q));
+  queue_shutdown(q);
+  TEST_ASSERT_TRUE(is_shutdown(q));
+  TEST_ASSERT_TRUE(is_empty(q));
+
+  queue_destroy(q);
+}
+
+void test_is_empty_when_not_empty(void) {
+  queue_t q = queue_init(10);
+  TEST_ASSERT_TRUE(q != NULL);
+
+  int data = 1;
+  enqueue(q, &data);
+  TEST_ASSERT_FALSE(is_empty(q));
+
+  dequeue(q);
+  TEST_ASSERT_TRUE(is_empty(q));
+
+  queue_destroy(q);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_create_destroy);
   RUN_TEST(test_queue_dequeue);
   RUN_TEST(test_queue_dequeue_multiple);
   RUN_TEST(test_queue_dequeue_shutdown);
+  RUN_TEST(test_dequeue_empty_queue_after_shutdown);
+  RUN_TEST(test_shutdown_empty_queue);
+  RUN_TEST(test_is_empty_when_not_empty);
   return UNITY_END();
 }
